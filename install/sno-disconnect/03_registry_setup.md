@@ -10,9 +10,9 @@ This document guides the administrator through setting up the local mirror regis
 
 | Task | Description |
 | --- | --- |
-| **Mirror Registry Installation** | Deploying the `mirror-registry` tool (Quay) onto the Disconnected Bastion to host container images. |
-| **Trust Establishment** | Configuring the Disconnected Bastion and future SNO node to trust the local registry's self-signed or internal CA certificate. |
-| **Content Ingestion** | Uploading the mirrored image set from physical media into the local registry using `oc-mirror`. |
+| Mirror Registry Installation | Deploying the `mirror-registry` tool (Quay) onto the Disconnected Bastion to host container images. |
+| Trust Establishment | Configuring the Disconnected Bastion and future SNO node to trust the local registry's self-signed or internal CA certificate. |
+| Content Ingestion | Uploading the mirrored image set from physical media into the local registry using `oc-mirror`. |
 
 ### Registry Configuration Reference Script
 
@@ -44,9 +44,9 @@ oc-mirror --from file://<path_to_media>/mirror-data \
 
 | Category | Justification |
 | --- | --- |
-| **1. Unattended Install** | Using the `--unattended` flag ensures a consistent deployment and automatically generates the `quay-install.log` for troubleshooting. |
-| **2. Port 8443** | By default, the `mirror-registry` tool uses port 8443 for HTTPS traffic; ensure this port is open in the local firewall. |
-| **3. Workspace Sync** | You must use the same `workspace` folder (or metadata) that was generated during the **Collection** phase to ensure successful ingestion. |
+| Unattended Install | Using the `--unattended` flag ensures a consistent deployment and automatically generates the `quay-install.log` for troubleshooting. |
+| Port 8443 | By default, the `mirror-registry` tool uses port 8443 for HTTPS traffic; ensure this port is open in the local firewall. |
+| Workspace Sync | You must use the same `workspace` folder (or metadata) that was generated during the **Collection** phase to ensure successful ingestion. |
 
 ---
 
@@ -54,8 +54,8 @@ oc-mirror --from file://<path_to_media>/mirror-data \
 
 | Category | Technical Requirement Details | Documentation Source |
 | --- | --- | --- |
-| **Internal DNS** | The `<registry_fqdn>` used during installation must be resolvable by both the Disconnected Bastion and the Target SNO Node. | [Installing on a single node](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/index) |
-| **Pull Secret Merge** | After the ingestion, `oc-mirror` generates a new `pull-secret.json`. This **must** be merged with your original Red Hat pull secret to allow the SNO node to pull from the local registry. | [oc-mirror Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/installing-mirroring-disconnected) |
-| **Persistent Storage** | The registry data is stored in `/var/lib/quay` by default. Ensure this directory is backed by sufficient persistent storage (minimum 200GB). | [Creating a mirror registry](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/installing-mirroring-creating-mirror-registry) |
+| Internal DNS | The `<registry_fqdn>` used during installation must be resolvable by both the Disconnected Bastion and the Target SNO Node. | [Installing on a single node](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/index) |
+| Pull Secret Merge | After the ingestion, `oc-mirror` generates a new `pull-secret.json`. This **must** be merged with your original Red Hat pull secret to allow the SNO node to pull from the local registry. | [oc-mirror Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/installing-mirroring-disconnected) |
+| Persistent Storage | The registry data is stored in `/var/lib/quay` by default. Ensure this directory is backed by sufficient persistent storage (minimum 200GB). | [Creating a mirror registry](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/installing-mirroring-creating-mirror-registry) |
 
 ---
