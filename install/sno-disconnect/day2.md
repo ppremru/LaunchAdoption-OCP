@@ -68,5 +68,3 @@ oc get sc
 | Disconnected Updates | Any future "Day 2" operators must be mirrored via the same `oc-mirror` process established in Step 2 to maintain the air-gapped supply chain integrity. | [oc-mirror Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/installing-mirroring-disconnected) |
 
 ---
-
-**This concludes the full documentation set for your disconnected SNO 4.16 solution.** **Is there anything else I can help you with?** For example, would you like a **Troubleshooting FAQ** covering the most common air-gapped installation errors (like certificate mismatches or pull-backoff issues)?
