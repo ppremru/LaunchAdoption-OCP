@@ -1,5 +1,3 @@
----
-
 # Troubleshooting & FAQ
 
 Created Date: January 14, 2026
