@@ -1,5 +1,3 @@
----
-
 # Single Node OpenShift (SNO) Disconnected Deployment Guide
 
 **Created Date**: January 14, 2026
