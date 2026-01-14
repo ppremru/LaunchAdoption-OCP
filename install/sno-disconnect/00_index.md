@@ -66,7 +66,7 @@ In a disconnected environment, the "Sneakernet" process is the manual method of 
 | — | [Deploy and harden a local Quay registry for air-gapped ingestion](./03_registry_setup.md) |
 | **Day 1: Installation** | [Define the SNO network and cluster logic via YAML manifests](./04_sno_configurations.md) |
 | — | [Build the self-contained agent.iso and initiate the hardware boot](./05_iso_generation.md) |
-| **Day 2: Hardening** | [Resolve common air-gap and certificate-related deployment faults](/trouble.md) |
+| **Day 2: Hardening** | [Resolve common air-gap and certificate-related deployment faults](./trouble.md) |
 | — | [Final verification of the environment prior to ISO execution](./checklist_pre_flight.md) |
 | — | [Validating cluster health, storage, and supply chain integrity](./checklist_post_install.md) |
 | — | [Implementing local storage (LVMS) and log aggregation](./day2.md) |
