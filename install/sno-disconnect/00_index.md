@@ -41,7 +41,7 @@ Extras:
 | Requirement | Description | Specifics |
 | --- | --- | --- |
 | Static IPs | Dedicated IP addresses for core infrastructure components. | <ul><li>One for Bastion</li><li>One for SNO Node</li></ul> |
-| DNS Records | Resolvable records for api, api-int, and wildcard apps pointing to the SNO node. Note: For SNO, all cluster records point to the same single node IP. | <ul><li>api</li><li>api-int</li><li>*.apps</li><li>registry-fqdn</li></ul> |
+| DNS Records | Resolvable records for api, api-int, and wildcard apps pointing to the same single node IP. | <ul><li>api</li><li>api-int</li><li>*.apps</li><li>registry-fqdn</li></ul> |
 | NTP | Mandatory local time synchronization source. | <ul><li>Local NTP Server IP</li></ul> |
 | Admin Credentials | Red Hat Customer Portal ID and SSH Key Pair for node access. | <ul><li>Pull Secret</li><li>Public SSH Key</li></ul> |
 
@@ -61,9 +61,9 @@ In a disconnected environment, the "Sneakernet" process is the manual method of 
 
 | Step Phase | Action | Requirement |
 | --- | --- | --- |
-| 1. Collection | Mirroring platform images and operator catalogs from Red Hat to local media. | Connected Bastion + Physical Media |
-| 2. Transition | Physically moving the media through security checkpoints or data diodes to the air-gapped zone. | Secure Chain of Custody |
-| 3. Ingestion | Uploading the mirrored content from the physical media into the local disconnected registry. | Disconnected Bastion + Local Registry |
+| Collection | Mirroring platform images and operator catalogs from Red Hat to local media. | Connected Bastion + Physical Media |
+| Transition | Physically moving the media through security checkpoints or data diodes to the air-gapped zone. | Secure Chain of Custody |
+| Ingestion | Uploading the mirrored content from the physical media into the local disconnected registry. | Disconnected Bastion + Local Registry |
 
 ### What to Expect from the Sneakernet Process
 
