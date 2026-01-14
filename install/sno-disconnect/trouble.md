@@ -109,5 +109,3 @@ curl -v --cacert /path/to/rootCA.crt https://<registry_fqdn>:8443/v2/_catalog
 | SAN Consistency | Modern container runtimes (CRI-O) strictly require the SAN field; they no longer fall back to the Common Name (CN) for identity verification. | [SNO Preparing to Install](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/installing-sno-preparing-to-install-on-a-single-node) |
 
 ---
-
-**This adds the final layer of enterprise readiness to your troubleshooting guide.** **Would you like me to generate a "Final Checklist" markdown file that you can use as a "Go/No-Go" gate before you start the physical ISO boot?**
