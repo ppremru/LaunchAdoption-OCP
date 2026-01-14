@@ -50,10 +50,10 @@ Extras:
 | Category | Technical Requirement Justification | Documentation Source |
 | --- | --- | --- |
 | SNO Node Storage | A minimum of 120 GB of storage is required for the base RHCOS installation on a single node. | [Installing on a single node](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/index) |
-| Bastion Storage | A 200 GB minimum recommendation accounts for platform images and common operators (e.g., LVM Storage, Logging). | [Mirroring images for disconnected installation](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/index) |
-| Registry Persistence | The Disconnected Bastion must house the Quay registry database and all image layers permanently. | [Creating a mirror registry](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/installing-mirroring-creating-mirror-registry) |
-| SNO Compute | Minimum requirements for SNO are 8 vCPUs and 16-32 GB of RAM to support combined control plane and worker services. | [SNO Preparing to Install](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/installing-sno-preparing-to-install-on-a-single-node) |
-| Installer Specs | The installer host requires enough space to run the openshift-install binary and generate a ~1 GB bootable ISO. | [Agent-based Installer Guide](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_an_on-premise_cluster_with_the_agent-based_installer/index) |
+| Bastion Storage | A 200 GB minimum recommendation accounts for platform images and common operators (e.g., LVM Storage, Logging). | [Mirroring images for disconnected installation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/index) |
+| Registry Persistence | The Disconnected Bastion must house the Quay registry database and all image layers permanently. | [Creating a mirror registry](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/installing-mirroring-creating-mirror-registry) |
+| SNO Compute | Minimum requirements for SNO are 8 vCPUs and 16-32 GB of RAM to support combined control plane and worker services. | [SNO Preparing to Install](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/installing-sno-preparing-to-install-on-a-single-node) |
+| Installer Specs | The installer host requires enough space to run the openshift-install binary and generate a ~1 GB bootable ISO. | [Agent-based Installer Guide](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_an_on-premise_cluster_with_the_agent-based_installer/index) |
 
 ## The Sneakernet Workflow
 
@@ -61,16 +61,16 @@ In a disconnected environment, the "Sneakernet" process is the manual method of 
 
 | Step Phase | Action | Requirement |
 | --- | --- | --- |
-| **1. Collection** | Mirroring platform images and operator catalogs from Red Hat to local media. | Connected Bastion + Physical Media |
-| **2. Transition** | Physically moving the media through security checkpoints or data diodes to the air-gapped zone. | Secure Chain of Custody |
-| **3. Ingestion** | Uploading the mirrored content from the physical media into the local disconnected registry. | Disconnected Bastion + Local Registry |
+| 1. Collection | Mirroring platform images and operator catalogs from Red Hat to local media. | Connected Bastion + Physical Media |
+| 2. Transition | Physically moving the media through security checkpoints or data diodes to the air-gapped zone. | Secure Chain of Custody |
+| 3. Ingestion | Uploading the mirrored content from the physical media into the local disconnected registry. | Disconnected Bastion + Local Registry |
 
 ### What to Expect from the Sneakernet Process
 
 | Category | Technical Reality & Advice |
 | --- | --- |
-| **Massive Data Footprint** | A standard OpenShift 4.16 platform mirror plus essential operators (LVM, Logging) typically ranges between **100GB and 150GB**. Ensure your physical media is formatted (XFS or EXT4 recommended) and has at least 200GB of free space. |
-| **Transfer Speed Bottlenecks** | The time required to "write" the data to media and then "read" it into the disconnected registry is often the longest phase of the installation. Use USB 3.1+ or NVMe-based external drives to minimize downtime. |
-| **Integrity Verification** | Large data transfers are susceptible to silent corruption during the move. It is highly recommended to run a checksum (SHA-256) on the connected side and verify it once the data reaches the disconnected side before starting the ingestion. |
+| Massive Data Footprint | A standard OpenShift 4.16 platform mirror plus essential operators (LVM, Logging) typically ranges between **100GB and 150GB**. Ensure your physical media is formatted (XFS or EXT4 recommended) and has at least 200GB of free space. |
+| Transfer Speed Bottlenecks | The time required to "write" the data to media and then "read" it into the disconnected registry is often the longest phase of the installation. Use USB 3.1+ or NVMe-based external drives to minimize downtime. |
+| Integrity Verification | Large data transfers are susceptible to silent corruption during the move. It is highly recommended to run a checksum (SHA-256) on the connected side and verify it once the data reaches the disconnected side before starting the ingestion. |
 
 ---
