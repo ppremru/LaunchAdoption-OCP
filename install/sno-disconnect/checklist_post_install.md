@@ -1,41 +1,45 @@
-# Post-Install Verification Checklist
+---
+
+# Post-Installation Verification Checklist
 
 Created Date: January 14, 2026
+Status: Cluster Validation
 
-Once the `openshift-install` tool reports that the installation is complete, use this checklist to verify the operational integrity of the SNO node. In a disconnected, hardened environment, this ensures that the internal image registry, storage, and networking are correctly utilizing your local infrastructure.
-
----
-
-## Core Cluster Health Verification
-
-| Task | Command | Expected Result | Status |
-| --- | --- | --- | --- |
-| Node Status | `oc get nodes` | The node is in the `Ready` state | [ ] |
-| Operator Status | `oc get clusteroperators` | All operators show `AVAILABLE: True` | [ ] |
-| — | — | All operators show `PROGRESSING: False` | [ ] |
-| — | — | All operators show `DEGRADED: False` | [ ] |
-| Certificate Validity | `oc get csr` | All CSRs are `Approved,Issued` | [ ] |
+Once the `wait-for install-complete` command returns successfully, use this checklist to verify that the cluster is healthy and that the air-gapped configuration is correctly routing image requests to your local registry.
 
 ---
 
-## Disconnected Supply Chain Verification
+## Core Cluster Health
 
-| Check | Action | Justification | Status |
-| --- | --- | --- | --- |
-| Image Pulls | `oc run test-pull --image=<registry_fqdn>:8443/ubi9/ubi:latest -- sleep 10` | Confirms the node can pull images from the local Quay registry | [ ] |
-| Redirection | `oc get imagecontentsourcepolicy` | Verifies the cluster is redirecting `quay.io` requests to your local registry | [ ] |
-| Trust Bundle | `oc get cm user-ca-bundle -n openshift-config` | Confirms your Internal Root CA is present in the cluster trusted store | [ ] |
+| Category | Checkpoint Item | Verification Command |
+| --- | --- | --- |
+| Nodes | SNO node is in Ready status | oc get nodes |
+| Operators | All ClusterOperators are Available: True | oc get co |
+| Version | Cluster version matches 4.16.x | oc get clusterversion |
+| Certificates | No pending CSRs require approval | oc get csr |
 
 ---
 
-## Storage & Workload Verification
+## Air-Gap & Registry Validation
 
-| Component | Action | Expected Result | Status |
-| --- | --- | --- | --- |
-| Local Storage | `oc get sc` | The `topolvm-provisioner` (LVMS) storage class is present | [ ] |
-| — | — | Storage class is marked as `(default)` | [ ] |
-| PV Creation | Create a test `PersistentVolumeClaim` | The PVC status changes to `Bound` | [ ] |
-| Air-Gap Security | `oc exec <pod_name> -- nslookup google.com` | Should fail, confirming no unauthorized outbound routing | [ ] |
+This section ensures the "Secret Sauce" of the disconnected installation (the image redirection) is functioning as intended.
+
+| Category | Checkpoint Item | Verification Command |
+| --- | --- | --- |
+| ICSP | ImageContentSourcePolicy is present and active | oc get icsp |
+| Registry | Internal image-registry operator is Available | oc get co image-registry |
+| Storage | Internal registry has a valid storage backend | oc get configs.imageregistry.operator.openshift.io/cluster -o yaml |
+| Redirection | Pods are pulling from <registry_fqdn> | oc get pods -A -o jsonpath='{.items[*].spec.containers[*].image}' |
+
+---
+
+## Persistence & Storage Readiness
+
+| Category | Checkpoint Item | Verification Command |
+| --- | --- | --- |
+| StorageClass | A default StorageClass is present (after LVMS install) | oc get sc |
+| PVs | Persistent Volumes can be bound to claims | oc get pvc -A |
+| Etcd | Etcd is healthy and synchronized | oc get pods -n openshift-etcd |
 
 ---
 
@@ -43,7 +47,9 @@ Once the `openshift-install` tool reports that the installation is complete, use
 
 | Category | Technical Requirement Details | Documentation Source |
 | --- | --- | --- |
-| Operator Degradation | If operators are `Degraded`, check the `openshift-image-registry` operator first; in disconnected sites, this is often caused by storage or certificate mismatches. | [Troubleshooting Installation Issues](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/validation_and_troubleshooting/installing-troubleshooting) |
-| Workload Testing | Running a simple `UBI` pod is the fastest way to verify that the entire stack—registry, networking, and scheduling—is functional. | [SNO Performance and Scalability](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/scalability_and_performance/index) |
-| Log Aggregation | Finalize the "Day 2" logging configuration only after confirming the cluster operators are stable to avoid resource contention during initial boot. | [Cluster Logging Documentation](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/logging/index) |
+| ICSP Role | The ImageContentSourcePolicy is the mechanism that instructs the node to transparently swap 'quay.io' links for your local registry FQDN. | [Disconnected installation mirroring](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/index) |
+| Registry Storage | In a Single Node OpenShift (SNO) deployment, the internal registry cannot use 'shared' storage like NFS easily; it must be configured for 'EmptyDir' or a local PV. | [Image Registry Operator](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/registry/index) |
+| CSR Monitoring | While the Agent-installer handles most certificate signing, manual approval of Kubelet CSRs is occasionally required if the node name changes during boot. | [OCP Node Management](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/nodes/index) |
+| etcd Quorum | On a single node, etcd acts as a standalone database. High disk I/O latency on the SNO node is the leading cause of etcd instability. | [SNO Performance and Scalability](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/scalability_and_performance/index) |
 
+---

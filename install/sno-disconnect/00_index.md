@@ -1,3 +1,5 @@
+---
+
 # Single Node OpenShift (SNO) Disconnected Deployment Guide
 
 **Created Date**: January 14, 2026
@@ -24,16 +26,18 @@ Before beginning the implementation, ensure the following prerequisites are met 
 
 | Requirement | Description | Specifics |
 | --- | --- | --- |
-| Static IPs | Two dedicated IP addresses for core infrastructure components. | Bastion, SNO Node|
-| DNS Records | Resolvable records pointing to the same single node IP. | `api`, `api-int`, `*.apps`, `registry-fqdn` |
+| Static IPs | Dedicated IP addresses for core infrastructure components. | One for Bastion |
+| — | — | One for SNO Node |
+| DNS Records | Resolvable records pointing to the single node IP. *.apps must point to SNO IP. | api, api-int, *.apps |
+| — | — | registry-fqdn |
 | NTP | Mandatory local time synchronization source. | Local NTP Server IP |
-| Admin Credentials | Red Hat Portal ID and SSH Key Pair for node access. | `Pull Secret`, `Public SSH Key` |
+| Admin Credentials | Red Hat Portal ID and SSH Key Pair for node access. | Pull Secret, Public SSH Key |
 
 ---
 
 ## Pre-Flight Resource Validation
 
-Failure to meet these minimums will cause the SNO installation or Day 2 operator deployments to fail.
+Failure to meet these minimums will cause the SNO installation or Day 2 operator deployments to fail. Ensure RHCOS version matches OCP 4.16.
 
 | Category | Technical Requirement Justification | Documentation Source |
 | --- | --- | --- |
@@ -61,21 +65,21 @@ In a disconnected environment, the "Sneakernet" process is the manual method of 
 
 | Phase | Objective |
 | --- | --- |
-| **Day 0: Preparation** | [Establish the connected staging environment and gather binaries](./01_bastion_prep.md) |
-| — | [Declaratively mirror OCP images and operators for physical transfer](./02_mirroring_content.md) |
-| — | [Deploy and harden a local Quay registry for air-gapped ingestion](./03_registry_setup.md) |
-| **Day 1: Installation** | [Define the SNO network and cluster logic via YAML manifests](./04_sno_configurations.md) |
-| — | [Build the self-contained agent.iso and initiate the hardware boot](./05_iso_generation.md) |
-| **Day 2: Hardening** | [Resolve common air-gap and certificate-related deployment faults](./trouble.md) |
-| — | [Final verification of the environment prior to ISO execution](./checklist_pre_flight.md) |
-| — | [Validating cluster health, storage, and supply chain integrity](./checklist_post_install.md) |
-| — | [Implementing local storage (LVMS) and log aggregation](./day2.md) |
+| **Day 0: Preparation** | [Establish the connected staging environment and gather binaries](https://www.google.com/search?q=./01_bastion_prep.md) |
+| — | [Declaratively mirror OCP images and operators for physical transfer](https://www.google.com/search?q=./02_mirroring_content.md) |
+| — | [Deploy and harden a local Quay registry for air-gapped ingestion](https://www.google.com/search?q=./03_registry_setup.md) |
+| **Day 1: Installation** | [Define the SNO network and cluster logic via YAML manifests](https://www.google.com/search?q=./04_sno_configurations.md) |
+| — | [Build the self-contained agent.iso and initiate the hardware boot](https://www.google.com/search?q=./05_iso_generation.md) |
+| **Day 2: Hardening** | [Resolve common air-gap and certificate-related deployment faults](https://www.google.com/search?q=./trouble.md) |
+| — | [Final verification of the environment prior to ISO execution](https://www.google.com/search?q=./checklist_pre_flight.md) |
+| — | [Validating cluster health, storage, and supply chain integrity](https://www.google.com/search?q=./checklist_post_install.md) |
+| — | [Implementing local storage (LVMS) and log aggregation](https://www.google.com/search?q=./day2.md) |
 
 ---
 
 ## Appendix: Methodology & Scope
 
-While official Red Hat documentation provides foundational technical references for individual components, this guide serves as an architectural blueprint synthesized for **high-security, disconnected environments.**
+While official Red Hat documentation provides foundational technical references for individual components, this guide serves as an architectural blueprint specifically synthesized for **high-security, disconnected environments.**
 
 ### The "Secret Sauce"
 
@@ -83,4 +87,5 @@ While official Red Hat documentation provides foundational technical references 
 * **Agent-Based Architecture**: Utilizing the Agent-based Installer creates a "Cluster in a Box," reducing external infrastructure dependencies.
 * **Hardened Security by Default**: This methodology prioritizes established chain-of-trust protocols using Internal CAs and explicit certificate injection into the `additionalTrustBundle`.
 * **Pre-Flight Rigor**: Explicit "Go/No-Go" gates verify DNS, NTP, and Registry availability before physical provisioning begins.
+
 ---

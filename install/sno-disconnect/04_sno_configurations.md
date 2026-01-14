@@ -1,60 +1,63 @@
-# Step 4: Crafting SNO Configurations (Disconnected)
+# Step 4: SNO Node Configurations
 
 Created Date: January 14, 2026
+Status: Manifest Definition
 
-Status: Configuration Phase
+The Agent-based Installer requires two primary configuration files: `install-config.yaml` and `agent-config.yaml`. These files define the cluster's logical identity and the physical hardware networking respectively.
 
-This document guides the administrator through the creation of the two core YAML files required by the Agent-based Installer to deploy a Single Node OpenShift cluster. These files define the network, identity, and hardware specifics for the target node.
+---
 
-## Configuration Overview
+## Workspace Setup
 
-| Task | Description |
-| --- | --- |
-| **install-config.yaml** | Defines the cluster's base identity, including the cluster name, base domain, networking CIDRs, and the merged pull secret. |
-| **agent-config.yaml** | Defines the physical hardware details, such as static networking, disk selection, and the host's BMC (Baseboard Management Controller) information. |
-| **Automation Preparation** | Ensuring all variables (MAC addresses, IPs, and FQDNs) are gathered before generating the ISO. |
+Create a dedicated directory for the installation assets. This workspace will house the manifests and eventually the generated metadata.
 
-### SNO Configuration Reference Script
-
-> **Note**: These files represent a **baseline functional guide**. Administrators must replace placeholders (marked with `< >`) with values specific to their local environment.
-
-```yaml
-# 1. Cluster Definition
-# File: install-config.yaml
-apiVersion: v1
-baseDomain: <your_base_domain>
-metadata:
-  name: <cluster_name>
-compute:
-- name: worker
-  replicas: 0 # SNO requires 0 worker replicas
-controlPlane:
-  name: master
-  replicas: 1
-networking:
-  clusterNetwork:
-  - cidr: 10.128.0.0/14
-    hostPrefix: 23
-  networkType: OVNKubernetes
-  serviceNetwork:
-  - 172.30.0.0/16
-platform:
-  none: {}
-fips: true # Enabled for hardened solution requirements
-pullSecret: '<your_merged_pull_secret_content>'
-sshKey: '<your_public_ssh_key_content>'
+```bash
+mkdir sno-config
+cd sno-config
 
 ```
 
+---
+
+## Logical Configuration (install-config.yaml)
+
+This file defines the cluster name, the base domain, and the security trust bundle.
+
 ```yaml
-# 2. Hardware and Network Definition
-# File: agent-config.yaml
+apiVersion: v1
+baseDomain: <domain_name>
+compute:
+- name: worker
+  replicas: 0
+controlPlane:
+  name: master
+  replicas: 1
+metadata:
+  name: <cluster_name>
+platform:
+  none: {}
+pullSecret: '<merged_pull_secret>'
+sshKey: '<ssh_public_key>'
+additionalTrustBundle: |
+  -----BEGIN CERTIFICATE-----
+  <registry_ca_contents>
+  -----END CERTIFICATE-----
+
+```
+
+---
+
+## Physical Configuration (agent-config.yaml)
+
+This file maps the logical cluster to the physical hardware, including static networking and disk selection.
+
+```yaml
 apiVersion: v1
 kind: AgentConfig
 metadata:
   name: <cluster_name>
 hosts:
-  - hostname: <node_hostname>
+  - hostname: <sno_hostname>
     interfaces:
       - name: <interface_name>
         macAddress: <mac_address>
@@ -66,8 +69,8 @@ hosts:
           ipv4:
             enabled: true
             address:
-              - ip: <node_ip>
-                prefixLength: <prefix_length>
+              - ip: <sno_node_ip>
+                prefix-length: 24
       dns-resolver:
         config:
           server:
@@ -82,13 +85,16 @@ hosts:
 
 ---
 
-## Technical Process & Justifications
+## Hardware & Path Precision
 
-| Category | Justification |
-| --- | --- |
-| **1. Replicas: 0** | In a Single Node OpenShift deployment, the master node handles both control plane and worker workloads; setting worker replicas to 0 is mandatory. |
-| **2. NMState Config** | The `networkConfig` section uses NMState syntax to provide a declarative way to configure static IPs, which is required when DHCP is unavailable in the environment. |
-| **3. SSH Key** | Providing a public SSH key during installation is the only way to gain "backdoor" access to the node for troubleshooting during the initial boot phase. |
+For a successful SNO boot in a disconnected environment, the following hardware details must be verified.
+
+| Component | Requirement | Recommendation |
+| --- | --- | --- |
+| Interface Name | Must match the RHCOS kernel name (e.g., eno1, ens3) | Verify via 'ip link' on a Live ISO if unsure |
+| MAC Address | Must match the physical NIC intended for PXE/Boot | Double-check against physical labels or BIOS |
+| Installation Disk | The target drive for the RHCOS operating system | Use /dev/sda or /dev/nvme0n1 consistently |
+| Disk Pathing | Persistence across reboots in varied hardware | Use /dev/disk/by-id/ for unambiguous identification |
 
 ---
 
@@ -96,10 +102,9 @@ hosts:
 
 | Category | Technical Requirement Details | Documentation Source |
 | --- | --- | --- |
-| **Static IP Consistency** | The IP address assigned in `agent-config.yaml` must match the IP configured in your local DNS records (api, api-int, *.apps). | [Installing on a single node](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/index) |
-| **Disk Selection** | By default, the installer picks the first available disk. If the node has multiple disks, use the `rootDeviceHints` in `agent-config.yaml` to pin the installation to the correct 120GB+ drive. | [Agent-based Installer Guide](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_an_on-premise_cluster_with_the_agent-based_installer/index) |
-| **FIPS Compliance** | Enabling `fips: true` in `install-config.yaml` ensures the cluster utilizes FIPS-validated cryptographic modules from the moment of first boot. | [SNO Preparing to Install](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/installing-sno-preparing-to-install-on-a-single-node) |
+| Interface Mapping | In Agent-based installs, if the interface name in networkConfig does not match the hardware, the static IP will not bind, causing the node to be unreachable. | [Agent-based Installer Guide](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_an_on-premise_cluster_with_the_agent-based_installer/index) |
+| Disk Selection | The installer defaults to the first available disk. Forcing a specific disk path prevents accidental overwrites of existing data drives. | [SNO Preparing to Install](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/installing-sno-preparing-to-install-on-a-single-node) |
+| replicas: 0 | In a Single Node OpenShift deployment, worker replicas must be set to 0 as the master node handles both roles. | [Installing SNO Overview](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/index) |
+| additionalTrustBundle | This field is mandatory for disconnected installs. Without it, the node cannot verify the TLS certificate of the local Quay registry. | [Disconnected installation mirroring](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/index) |
 
 ---
-
-**Next Step:** With your YAML configurations finalized, would you like to move on to **05_iso_generation.md** to generate the final bootable ISO and begin the cluster verification?
