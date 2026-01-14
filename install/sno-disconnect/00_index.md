@@ -19,6 +19,8 @@ This documentation provides a step-by-step GUIDE to deploying a Single Node Open
 Extras:
 * [Day 2 Notes](./day2.md)
 * [Trouble Shooting Notes](./trouble.md)
+* [Checklist Pre](./checklist_pre_flight.md)
+* [Checklist Post](./checklist_post_install.md)
 
 ## Key Concepts
 
