@@ -1,5 +1,6 @@
 # OCP 
 
-Gathering my notes:
+Gathered Conversations:
 
 * [SNO Disconnected Install](./install/sno-disconnect/00_index.md)
+* What's next?
