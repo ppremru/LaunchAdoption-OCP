@@ -25,7 +25,7 @@ Extras:
 | Concept | Description | Links |
 | --- | --- | --- |
 | Single Node OpenShift (SNO) | Combines control plane and worker roles onto one host. Optimized for edge and low-resource environments. Note: Hardware requirements (CPU, RAM, and Disk) must be reviewed prior to installation to ensure the host can support both the control plane and your intended workloads. | [Minimum resource requirements for Single Node OpenShift](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/installing-sno-preparing-to-install-on-a-single-node%23minimum-resource-requirements-for-sno_installing-sno-preparing-to-install-on-a-single-node) |
-|  |  | [Official SNO Overview](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/index) |
+| - | - | [Official SNO Overview](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/index) |
 | oc-mirror Plugin v2 | The modern tool (v2) used to declaratively mirror images and operators to a local registry. | [oc-mirror Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/installing-mirroring-disconnected) |
 | Agent-based Installer | Generates a bootable ISO containing all configurations, removing the need for an external bootstrap VM. | [Agent-based Installer Guide](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_an_on-premise_cluster_with_the_agent-based_installer/index) |
 
@@ -44,14 +44,14 @@ Extras:
 | Requirement | Description | Specifics |
 | --- | --- | --- |
 | Static IPs | Dedicated IP addresses for core infrastructure components. | One for Bastion |
-|  |  | One for SNO Node |
+| - | - | One for SNO Node |
 | DNS Records | Resolvable records for api, api-int, and wildcard apps pointing to the same single node IP. | api |
-|  |  | api-int |
-|  |  | *.apps |
-|  |  | registry-fqdn |
+| - | - | api-int |
+| - | - | *.apps |
+| - | - | registry-fqdn |
 | NTP | Mandatory local time synchronization source. | Local NTP Server IP |
 | Admin Credentials | Red Hat Customer Portal ID and SSH Key Pair for node access. | Pull Secret |
-|  |  | Public SSH Key |
+| - | - | Public SSH Key |
 
 ## Pre-Flight Resource Validation
 
