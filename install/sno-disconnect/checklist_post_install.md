@@ -47,4 +47,3 @@ Once the `openshift-install` tool reports that the installation is complete, use
 | Workload Testing | Running a simple `UBI` pod is the fastest way to verify that the entire stack—registry, networking, and scheduling—is functional. | [SNO Performance and Scalability](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/scalability_and_performance/index) |
 | Log Aggregation | Finalize the "Day 2" logging configuration only after confirming the cluster operators are stable to avoid resource contention during initial boot. | [Cluster Logging Documentation](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/logging/index) |
 
-Would you like me to help you integrate these two new files into your main `00_index.md` file?
