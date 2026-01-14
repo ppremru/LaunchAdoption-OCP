@@ -2,4 +2,4 @@
 
 Gathering my notes:
 
-* [SNO Disconnected Install SOP](./install/sno-disconnect/00_index.md)
+* [SNO Disconnected Install](./install/sno-disconnect/00_index.md)
