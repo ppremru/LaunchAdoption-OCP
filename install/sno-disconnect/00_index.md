@@ -43,12 +43,12 @@ Extras:
 
 | Requirement | Description | Specifics |
 | --- | --- | --- |
-| Static IPs | Dedicated IP addresses for core infrastructure components. | One for Bastion |
+| Static IPs | Two dedicated IP addresses. | One for Bastion |
 | - | - | One for SNO Node |
-| DNS Records | Resolvable records for api, api-int, and wildcard apps pointing to the same single node IP. | api |
-| - | - | api-int |
-| - | - | *.apps |
-| - | - | registry-fqdn |
+| DNS Records | Resolvable records pointing to the same single node IP. | `api` |
+| - | - | `api-int` |
+| - | - | `*.apps` |
+| - | - | `registry-fqdn` |
 | NTP | Mandatory local time synchronization source. | Local NTP Server IP |
 | Admin Credentials | Red Hat Customer Portal ID and SSH Key Pair for node access. | Pull Secret |
 | - | - | Public SSH Key |
