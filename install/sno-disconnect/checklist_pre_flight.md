@@ -1,5 +1,3 @@
----
-
 # Pre-Flight Deployment Checklist
 
 Created Date: January 14, 2026
