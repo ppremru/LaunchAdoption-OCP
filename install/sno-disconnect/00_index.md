@@ -4,7 +4,7 @@ Created Date: January 14, 2026
 
 Target Version: OpenShift Container Platform 4.16
 
-This documentation provides a step-by-step GUIDE to deploying a Single Node OpenShift (SNO) cluster in a disconnected (air-gapped) environment using the Agent-based Installer.
+This documentation provides a step-by-step GUIDE to deploying a Single Node OpenShift (SNO) cluster in a disconnected (air-gapped) environment using the Agent-based Installer.  In a disconnected environment, distinguishing between IPI (Installer Provisioned Infrastructure) and UPI (User Provisioned Infrastructure) is critical. For this guide, you are using the Agent-based Installer, which is effectively a "hybrid" or "Modified IPI" flow because the installer creates the bootable engine (the ISO), but you provide the static network definitions and the hardware.
 
 ## Installation Steps
 
