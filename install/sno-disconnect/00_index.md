@@ -8,7 +8,7 @@ This documentation provides a step-by-step GUIDE to deploying a Single Node Open
 
 ## Installation Steps
 
-| # | Step Description | File Reference |
+| # | Step Description | 
 | --- | --- | --- |
 | 1. | [Setting up the Connected Bastion and acquiring the Pull Secret.](./01_bastion_prep.md) |
 | 2. | [Performing the initial mirror to physical media.](/02_mirroring_content.md) |
