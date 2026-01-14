@@ -10,18 +10,14 @@ This document provides a technical baseline for identifying and resolving the mo
 
 | Category | Observed Issue | Potential Root Cause & Resolution |
 | --- | --- | --- |
-| **Pull Failures** | Pods remain in `ImagePullBackOff` or `ErrImagePull`. | **Cause:** The node cannot reach the registry or lacks authentication. <br>
-
-<br> **Resolution:** Verify the merged `pull-secret` includes the credentials for your local registry. Check firewall port 8443 on the Bastion. |
-| **Trust Errors** | Errors like `x509: certificate signed by unknown authority`. | **Cause:** The SNO node does not trust the registry's CA. <br>
-
-<br> **Resolution:** Ensure the Registry CA was added to the `additionalTrustBundle` in `install-config.yaml`. |
-| **DNS Failures** | The install stalls at "Waiting for API." | **Cause:** Internal DNS is not resolving `api.<cluster>.<domain>`. <br>
-
-<br> **Resolution:** Verify your local DNS records match the static IP defined in `agent-config.yaml`. |
-| **Time Drift** | Etcd operators remain in a `Degraded` state. | **Cause:** The SNO node clock has drifted from the local source. <br>
-
-<br> **Resolution:** Manually sync the hardware clock and verify the NTP server is reachable from the SNO node. |
+| Pull Failures | Pods remain in `ImagePullBackOff` or `ErrImagePull` | Cause: The node cannot reach the registry or lacks authentication |
+| — | — | Resolution: Verify the merged `pull-secret` includes the credentials for your local registry. Check firewall port `8443` on the Bastion |
+| Trust Errors | Errors like `x509: certificate signed by unknown authority` | Cause: The SNO node does not trust the registry's CA |
+| — | — | Resolution: Ensure the Registry CA was added to the `additionalTrustBundle` in `install-config.yaml` |
+| DNS Failures | The install stalls at "Waiting for API" | Cause: Internal DNS is not resolving `api.<cluster>.<domain>` |
+| — | — | Resolution: Verify your local DNS records match the static IP defined in `agent-config.yaml` |
+| Time Drift | Etcd operators remain in a `Degraded` state | Cause: The SNO node clock has drifted from the local source |
+| — | — | Resolution: Manually sync the hardware clock and verify the NTP server is reachable from the SNO node |
 
 ---
 
