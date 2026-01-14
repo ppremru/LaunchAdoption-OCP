@@ -1,5 +1,3 @@
----
-
 # Post-Installation Verification Checklist
 
 Created Date: January 14, 2026
