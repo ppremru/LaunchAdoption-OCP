@@ -63,15 +63,15 @@ In a disconnected environment, the "Sneakernet" process is the manual method of 
 
 | Phase | Objective |
 | --- | --- |
-| **Day 0: Preparation** | [Establish the connected staging environment and gather binaries](https://www.google.com/search?q=./01_bastion_prep.md) |
-| — | [Declaratively mirror OCP images and operators for physical transfer](https://www.google.com/search?q=./02_mirroring_content.md) |
-| — | [Deploy and harden a local Quay registry for air-gapped ingestion](https://www.google.com/search?q=./03_registry_setup.md) |
-| **Day 1: Installation** | [Define the SNO network and cluster logic via YAML manifests](https://www.google.com/search?q=./04_sno_configurations.md) |
-| — | [Build the self-contained agent.iso and initiate the hardware boot](https://www.google.com/search?q=./05_iso_generation.md) |
-| **Day 2: Hardening** | [Resolve common air-gap and certificate-related deployment faults](https://www.google.com/search?q=./trouble.md) |
-| — | [Final verification of the environment prior to ISO execution](https://www.google.com/search?q=./checklist_pre_flight.md) |
-| — | [Validating cluster health, storage, and supply chain integrity](https://www.google.com/search?q=./checklist_post_install.md) |
-| — | [Implementing local storage (LVMS) and log aggregation](https://www.google.com/search?q=./day2.md) |
+| **Day 0: Preparation** | [Establish the connected staging environment and gather binaries](./01_bastion_prep.md) |
+| — | [Declaratively mirror OCP images and operators for physical transfer](./02_mirroring_content.md) |
+| — | [Deploy and harden a local Quay registry for air-gapped ingestion](./03_registry_setup.md) |
+| **Day 1: Installation** | [Define the SNO network and cluster logic via YAML manifests](./04_sno_configurations.md) |
+| — | [Build the self-contained agent.iso and initiate the hardware boot](./05_iso_generation.md) |
+| **Day 2: Hardening** | [Resolve common air-gap and certificate-related deployment faults](./trouble.md) |
+| — | [Final verification of the environment prior to ISO execution](./checklist_pre_flight.md) |
+| — | [Validating cluster health, storage, and supply chain integrity](./checklist_post_install.md) |
+| — | [Implementing local storage (LVMS) and log aggregation](./day2.md) |
 
 ---
 
