@@ -56,4 +56,4 @@ oc adm release info <registry_fqdn>:8443/ocp4/openshift4-release:4.16.0-x86_64
 | DNS Resolution | The `api` and `api-int` endpoints must be resolvable before the installer starts, as the node will attempt to reach itself via these FQDNs. | [Installing on a single node](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/index) |
 | ISO Verification | If the ISO fails to boot or hangs, verify the checksum of the `agent.iso` after transferring it to your boot media to rule out corruption. | [Agent-based Installer Guide](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_an_on-premise_cluster_with_the_agent-based_installer/index) |
 
-Would you like me to prepare the **post_install_verification.md** with these same formatting removals?
+---
