@@ -2,8 +2,6 @@
 
 Created Date: January 14, 2026
 
-Status: Operational Support
-
 This document provides a technical baseline for identifying and resolving the most common issues encountered during a disconnected SNO 4.16 installation. Because the environment is air-gapped, traditional "just Google it" methods are unavailable; this guide serves as your local reference.
 
 ## Common Installation Faults
@@ -50,9 +48,9 @@ oc get clusteroperators | grep -v "True.*False.*False"
 
 | Question | Technical Answer |
 | --- | --- |
-| **Why is my ISO so small?** | The `agent.iso` is a "Next Generation" installer. It does not contain the full OCP payload; it contains the logic to pull that payload from your local registry during the boot process. |
-| **Can I change the IP after install?** | No. Static IPs in SNO are difficult to change post-install. If an IP change is required, it is usually faster to re-generate the `agent-config.yaml` and re-deploy the ISO. |
-| **How do I reset the install?** | If the install fails, you must wipe the target disk (standard `dd` or `wipefs` on the partitions) and reboot from the ISO to start fresh. |
+| Why is my ISO so small | The `agent.iso` is a "Next Generation" installer. It does not contain the full OCP payload; it contains the logic to pull that payload from your local registry during the boot process. |
+| Can I change the IP after install | No. Static IPs in SNO are difficult to change post-install. If an IP change is required, it is usually faster to re-generate the `agent-config.yaml` and re-deploy the ISO. |
+| How do I reset the install | If the install fails, you must wipe the target disk (standard `dd` or `wipefs` on the partitions) and reboot from the ISO to start fresh. |
 
 ---
 
@@ -60,8 +58,56 @@ oc get clusteroperators | grep -v "True.*False.*False"
 
 | Category | Technical Requirement Details | Documentation Source |
 | --- | --- | --- |
-| **Gathering Logs** | If an install fails completely, use `openshift-install agent gather-bootstrap-logs --dir ./sno-config` to pull a diagnostic bundle for offline analysis. | [Troubleshooting Installation Issues](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/validation_and_troubleshooting/installing-troubleshooting) |
-| **Disk Cleanup** | Before a re-install, ensure no "stale" partitions exist. The Agent installer may fail if it detects existing OVN or etcd data on the target drive. | [Agent-based Installer Guide](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_an_on-premise_cluster_with_the_agent-based_installer/index) |
-| **Registry Performance** | If the image pull is extremely slow, check the CPU/Memory usage of the Quay container on the Bastion. Small bastions often throttle the registry during the initial 150GB burst. | [Mirror Registry Guide](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/installing-mirroring-creating-mirror-registry) |
+| Gathering Logs | If an install fails completely, use `openshift-install agent gather-bootstrap-logs --dir ./sno-config` to pull a diagnostic bundle for offline analysis. | [Troubleshooting Installation Issues](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/validation_and_troubleshooting/installing-troubleshooting) |
+| Disk Cleanup | Before a re-install, ensure no "stale" partitions exist. The Agent installer may fail if it detects existing OVN or etcd data on the target drive. | [Agent-based Installer Guide](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_an_on-premise_cluster_with_the_agent-based_installer/index) |
+| Registry Performance | If the image pull is extremely slow, check the CPU/Memory usage of the Quay container on the Bastion. Small bastions often throttle the registry during the initial 150GB burst. | [Mirror Registry Guide](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/installing-mirroring-creating-mirror-registry) |
 
 ---
+
+## Certificate & Trust Failures
+
+In a hardened, disconnected SNO environment, certificate errors are the most common reason for installation failure. These issues usually manifest as `x509: certificate signed by unknown authority` or `ImagePullBackOff` during the bootstrap phase.
+
+### Certificate Chain Errors
+
+| Error Message | Potential Root Cause | Resolution |
+| --- | --- | --- |
+| `x509: certificate signed by unknown authority` | The SNO node does not have the Root CA in its trust store. | Add the Root CA to the `additionalTrustBundle` in `install-config.yaml`. |
+| — | The `ssl.crt` on the registry is missing the intermediate chain. | Ensure `ssl.crt` contains the Registry Cert, followed by Intermediate Certs, then Root CA. |
+| `x509: certificate relies on legacy Common Name field` | The certificate is missing the Subject Alternative Name (SAN). | Regenerate the CSR including `subjectAltName` for both the FQDN and IP of the registry. |
+| `x509: certificate has expired or is not yet valid` | Significant time drift between the registry and the SNO node. | Verify NTP sync on both the Disconnected Bastion and the SNO hardware. |
+
+---
+
+### Technical Diagnostics for Trust
+
+If you suspect a certificate issue, run these commands from the **Disconnected Bastion** to verify the registry's presentation.
+
+```bash
+# 1. Check the Certificate Chain
+# This shows exactly what the registry is sending to clients
+openssl s_client -showcerts -connect <registry_fqdn>:8443
+
+# 2. Verify the SAN (Subject Alternative Name)
+# Ensure the FQDN and IP are both listed in the output
+openssl x509 -in /opt/quay/config/ssl.crt -text -noout | grep -A 1 "Subject Alternative Name"
+
+# 3. Test Local Trust on Bastion
+# If this fails on the bastion, it will definitely fail on the SNO node
+curl -v --cacert /path/to/rootCA.crt https://<registry_fqdn>:8443/v2/_catalog
+
+```
+
+---
+
+### Architectural Justifications & Reference Notes
+
+| Category | Technical Requirement Details | Documentation Source |
+| --- | --- | --- |
+| Bundle Format | The `additionalTrustBundle` must be a valid PEM-encoded block. Multiple CAs can be appended one after another in the same block. | [Mirroring images for disconnected installation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/index) |
+| Ignition Overwrite | During boot, the Agent Installer writes the `additionalTrustBundle` into `/etc/pki/ca-trust/source/anchors/` on the SNO node and runs `update-ca-trust` automatically. | [Agent-based Installer Guide](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_an_on-premise_cluster_with_the_agent-based_installer/index) |
+| SAN Consistency | Modern container runtimes (CRI-O) strictly require the SAN field; they no longer fall back to the Common Name (CN) for identity verification. | [SNO Preparing to Install](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_a_single_node/installing-sno-preparing-to-install-on-a-single-node) |
+
+---
+
+**This adds the final layer of enterprise readiness to your troubleshooting guide.** **Would you like me to generate a "Final Checklist" markdown file that you can use as a "Go/No-Go" gate before you start the physical ISO boot?**
