@@ -1,5 +1,3 @@
----
-
 # Step 1: Staging the Connected Bastion
 
 Created Date: January 14, 2026
