@@ -11,7 +11,7 @@ This documentation provides a step-by-step GUIDE to deploying a Single Node Open
 | # | Step Description | 
 | --- | --- |
 | 1. | [Setting up the Connected Bastion and acquiring the Pull Secret.](./01_bastion_prep.md) |
-| 2. | [Performing the initial mirror to physical media.](/02_mirroring_content.md) |
+| 2. | [Performing the initial mirror to physical media.](./02_mirroring_content.md) |
 | 3. | [Setting up the Disconnected Bastion (Local Host) and the Mirror Registry.](./03_registry_setup.md) |
 | 4. | [Crafting the YAML files for the specific hardware.](./04_sno_configurations.md) |
 | 5. | [Final ISO creation and cluster verification.](./05_iso_generation.md) |
