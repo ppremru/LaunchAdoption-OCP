@@ -1,5 +1,3 @@
----
-
 # Step 5: ISO Generation & Hardware Boot
 
 Created Date: January 14, 2026
