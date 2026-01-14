@@ -10,9 +10,9 @@ Once the Single Node OpenShift (SNO) cluster is "Ready," the focus shifts to ope
 
 | Task | Description |
 | --- | --- |
-| **Storage Provisioning** | Configuring the **LVM Storage (LVMS)** operator to provide persistent volumes (PVs) using the remaining local disk space. |
-| **Audit & Logging** | Deploying the **Cluster Logging** operator to aggregate system and application logs for troubleshooting and compliance. |
-| **Cert-Manager Setup** | (Optional) Deploying cert-manager to automate the management and issuance of certificates within the cluster. |
+| Storage Provisioning | Configuring the **LVM Storage (LVMS)** operator to provide persistent volumes (PVs) using the remaining local disk space. |
+| Audit & Logging | Deploying the **Cluster Logging** operator to aggregate system and application logs for troubleshooting and compliance. |
+| Cert-Manager Setup | (Optional) Deploying cert-manager to automate the management and issuance of certificates within the cluster. |
 
 ### Day 2 Reference Script
 
@@ -53,9 +53,9 @@ oc get sc
 
 | Category | Justification |
 | --- | --- |
-| **1. LVMS Operator** | SNO lacks external storage (SAN/NAS). The LVM Storage operator allows the node to use its own local NVMe/SSD disks for dynamic volume provisioning. |
-| **2. Namespace Scoping** | Operators like Logging and Storage should be isolated in their own namespaces (`openshift-logging`, `openshift-storage`) to maintain resource boundaries. |
-| **3. Overprovisioning** | In a single-node environment, a 10x overprovisioning ratio is often used to maximize the utility of the available physical disk for multiple small workloads. |
+| LVMS Operator | SNO lacks external storage (SAN/NAS). The LVM Storage operator allows the node to use its own local NVMe/SSD disks for dynamic volume provisioning. |
+| Namespace Scoping | Operators like Logging and Storage should be isolated in their own namespaces (`openshift-logging`, `openshift-storage`) to maintain resource boundaries. |
+| Overprovisioning | In a single-node environment, a 10x overprovisioning ratio is often used to maximize the utility of the available physical disk for multiple small workloads. |
 
 ---
 
@@ -63,9 +63,9 @@ oc get sc
 
 | Category | Technical Requirement Details | Documentation Source |
 | --- | --- | --- |
-| **Disk Readiness** | For LVMS to work, the target disk must be "clean" (no existing partitions or filesystems) outside of the main OS partition. | [LVMS Operator Documentation](https://www.google.com/search?q=https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/storage/logical-volume-manager-storage) |
-| **Resource Constraints** | SNO nodes often have limited CPU/RAM. Monitor the overhead of the Logging operator, as it can consume significant resources during high-burst log events. | [SNO Performance and Scalability](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/scalability_and_performance/index) |
-| **Disconnected Updates** | Any future "Day 2" operators must be mirrored via the same `oc-mirror` process established in Step 2 to maintain the air-gapped supply chain integrity. | [oc-mirror Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/installing-mirroring-disconnected) |
+| Disk Readiness | For LVMS to work, the target disk must be "clean" (no existing partitions or filesystems) outside of the main OS partition. | [LVMS Operator Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/storage/logical-volume-manager-storage) |
+| Resource Constraints | SNO nodes often have limited CPU/RAM. Monitor the overhead of the Logging operator, as it can consume significant resources during high-burst log events. | [SNO Performance and Scalability](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/scalability_and_performance/index) |
+| Disconnected Updates | Any future "Day 2" operators must be mirrored via the same `oc-mirror` process established in Step 2 to maintain the air-gapped supply chain integrity. | [oc-mirror Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/installing-mirroring-disconnected) |
 
 ---
 
