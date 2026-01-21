@@ -24,10 +24,8 @@ Before beginning the implementation, ensure the following prerequisites are met 
 
 | Requirement | Description | Specifics |
 | --- | --- | --- |
-| Static IPs | Dedicated IP addresses for core infrastructure components. | One for Bastion |
-| — | — | One for SNO Node |
-| DNS Records | Resolvable records pointing to the single node IP. *.apps must point to SNO IP. | api, api-int, *.apps |
-| — | — | registry-fqdn |
+| Static IPs | Dedicated IP addresses for core infrastructure components. | One for Bastion, One for SNO Node |
+| DNS Records | Resolvable records pointing to the single node IP.  | `api, api-int, *.apps, registry-fqdn` |
 | NTP | Mandatory local time synchronization source. | Local NTP Server IP |
 | Admin Credentials | Red Hat Portal ID and SSH Key Pair for node access. | Pull Secret, Public SSH Key |
 
