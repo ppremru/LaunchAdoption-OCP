@@ -4,7 +4,7 @@
 
 **Target Version**: OpenShift Container Platform 4.16
 
-This documentation provides a hardened, end-to-end workflow for deploying a Single Node OpenShift (SNO) cluster in a disconnected environment. We utilize the **Agent-based Installer**, which embeds configurations directly into a bootable ISO, eliminating the need for external bootstrap infrastructure during the final boot.
+This documentation provides a workflow for deploying a Single Node OpenShift (SNO) cluster in a disconnected environment. We utilize the **Agent-based Installer**, which embeds configurations directly into a bootable ISO, eliminating the need for external bootstrap infrastructure during the final boot.
 
 ---
 
