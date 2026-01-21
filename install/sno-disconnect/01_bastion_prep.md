@@ -66,18 +66,6 @@ oc-mirror version
 
 ---
 
-## Environment Persistence
-
-To ensure the tooling is available across all terminal sessions on the Bastion, verify the following configuration.
-
-| Task | Action | Verification |
-| --- | --- | --- |
-| Path Persistence | Ensure /usr/local/bin is in your secure_path | echo $PATH |
-| Alias Setup | Optional: Alias k=kubectl for efficiency | alias k |
-| Profile Loading | Reload .bashrc after manual path changes | source ~/.bashrc |
-
----
-
 ## Architectural Justifications & Reference Notes
 
 | Category | Technical Requirement Details | Documentation Source |
