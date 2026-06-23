@@ -9,8 +9,7 @@ Target Environment: Multi-Node Bare-Metal (High Availability)
 ## Why This Guide Exists
 
 * **The Documentation:** Red Hat’s official guides serve as the comprehensive technical reference for the platform, organizing features by individual components.
-* **This Guide:** This document acts as a streamlined, chronological checklist that pulls those independent pieces together into a single workflow.
-* **The Goal:** To provide an operational path for an offline OpenShift installation.
+* **This Guide:** This document acts as a streamlined, chronological checklist that pulls the documentation for the individual comonents together into a single workflow.
 
 ---
 
