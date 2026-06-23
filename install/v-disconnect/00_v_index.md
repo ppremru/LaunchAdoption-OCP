@@ -1,55 +1,81 @@
-# Disconnected OpenShift Virtualization Deployment Index
+# Disconnected OpenShift Virtualization Deployment Guide
 
-Created Date: June 23, 2026
-Status: Production Blueprint
-Target Environment: Multi-Node Bare-Metal (High Availability)
+**Created Date**: June 23, 2026
+**Target Version**: OpenShift Container Platform 4.16
 
----
-
-## Why This Guide Exists
-
-* **The Documentation:** Red Hat’s official guides serve as the comprehensive technical reference for the platform, organizing features by individual components.
-* **This Guide:** This document acts as a streamlined, chronological checklist that pulls the documentation for the individual comonents together into a single workflow.
+This documentation provides a chronological deployment checklist for building a highly available, multi-node OpenShift Container Platform cluster with active OpenShift Virtualization natively offline. We utilize the **Agent-based Installer** to embed static network configurations and local registry mirror definitions directly into a self-contained bootable ISO, eliminating external DHCP, PXE, or bootstrap infrastructure requirements during hardware provisioning.
 
 ---
 
-## Deployment Blueprint Matrix
+## Working Environment Definitions
 
-The installation is segmented into five distinct operational phases. Each phase consumes the outputs of the previous step and must be fully validated before moving forward.
-
-| File Reference | Operational Phase | Current Status | Primary Milestone / Output |
-| --- | --- | --- | --- |
-| `01_v_bastion_prep.md` | Staging the Connected Bastion | Environment Preparation | Validated CLI tools and a unified online/offline pull secret. |
-| `02_v_mirroring_content.md` | Content Mirroring for the Air-Gap | Data Collection | Stateful payload bundle containing platform and operator layers. |
-| `03_v_registry_setup.md` | Local Registry & Air-Gapped Ingestion | Registry Configuration | Populated internal OCI registry and cryptographic mirror tables. |
-| `04_v_infrastructure_config.md` | Infrastructure & Media Compilation | Manifest Definition | Static host network maps and a bootable Agent installer ISO. |
-| `05_v_virtualization_enable.md` | Virtualization & Day 2 Enablement | Post-Install Validation | Activated hypervisor engine and layer-2 guest bridging policies. |
+| System Component | Description & Technical Role | Network Placement |
+| --- | --- | --- |
+| Connected Bastion | RHEL 8/9 host used to securely download client binaries and mirror platform/operator images via `oc-mirror`. | Internet Facing |
+| Local Mirror Registry | Internal Quay enterprise registry deployed on port 8443 acting as the local software warehouse repository. | Air-Gapped |
+| Target Cluster Nodes | Three (3) physical control plane masters and multiple physical compute workers dedicated to hypervisor workloads. | Air-Gapped |
 
 ---
 
-## Operational Workflow Overview
+## Infrastructure & Network Requirements
 
-### 1. Software Logistics Foundation (Steps 1–3)
-Before a single piece of server hardware is unboxed or booted inside the air-gapped data center, the entire software logistics pipeline must be treated as a physical supply chain. In an isolated environment, software cannot be fetched on demand; it must be treated as physical inventory that is staged, quality-checked, and warehoused.
+Before beginning the hardware deployment phase, ensure the following core networking gates are active within the air-gapped data center:
 
-* **Quality Control at the Border (`01_bastion_prep.md`):** The connected bastion acts as our shipping dock. We download binaries and immediately execute cryptographic checksum verifications. This ensures we do not clear corrupted or tampered "inventory" to cross the air-gap perimeter.
-* **Manifest Bundling & Transit (`02_mirroring_content.md`):** We execute a unified mirroring payload to pull the platform and operators down to physical transport media simultaneously. This locks their inter-operator version dependencies before they leave the network.
-* **The Local Warehouse (`03_registry_setup.md`):** Once across the perimeter, the transport media is unladen, and the image layers are ingested directly into the internal OCI registry. This registry functions as our local warehouse, completely replacing public external endpoints as the sole root of trust for the environment.
-
-### 2. Platform & Hypervisor Core Execution (Steps 4–5)
-With the local warehouse fully stocked, the installation transitions from software logistics to physical cluster manufacturing.
-
-* **Blueprint Definition (`04_infrastructure_config.md`):** Logical cluster pools and physical host identity maps—including MAC addresses and static IP routing tables—are defined in parallel layout manifests. 
-* **Self-Contained Assembly (`05_virtualization_enable.md`):** The installer engine consumes these static definitions to compile a single, bootable installation ISO. Because our software logistics pipeline was perfectly executed in Steps 1–3, this ISO contains every cryptographic mirror table required to build the multi-node hypervisor cluster completely natively offline, with zero dependency on external PXE or DHCP networks.
+| Requirement | Description | Specifics |
+| --- | --- | --- |
+| Static IP Pools | Isolated IPs assigned to master nodes, worker nodes, and logical VIP layers. | Individual Node IPs + API and Ingress VIPs |
+| Offline DNS Records | Internal resolvable records mapping cluster routing and local warehouse lookups. | `api`, `api-int`, `*.apps`, and your internal `<registry_fqdn>` |
+| Local NTP Source | Mandatory time synchronization engine to prevent database consensus failure. | Local Stratum-1 NTP Server IP |
+| Switch Port Fabrics | Worker node secondary ports (e.g., `eth1`) bound to virtual networks. | Physical Switch Ports configured as L2 VLAN Trunks |
 
 ---
 
-## Core Master References
+## Pre-Flight Resource Validation
 
-These authoritative Red Hat product streams form the baseline syntax reference for this entire deployment structure:
+Failure to satisfy these baseline resource metrics will block the initialization sequence or cause down-stream hypervisor deployment failures.
 
-* **Platform Documentation:** [Red Hat OpenShift Container Platform 4.16 Documentation Portal](https://docs.redhat.com/en/documentation/openshift_container_platform/)
-* **Mirroring Utility Engine:** [Mirroring Images via the oc-mirror Plugin Guide](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/mirroring_images_for_a_disconnected_installation_using_the_oc-mirror_plugin/)
-* **Orchestrated Provisioning:** [Installing a Cluster via the Agent-Based Installer](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_a_cluster_using_the_agent-based_installer/)
-* **Hypervisor Lifecycle:** [OpenShift Virtualization Core Installation and Administration](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/openshift_virtualization/installing-virt)
-* **Node Networking Control:** [Advanced Interface Management with the Kubernetes NMState Operator](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/networking/index#virt-networking-with-kubernetes-nmstate)
+| Category | Technical Requirement Justification | Documentation Source |
+| --- | --- | --- |
+| Node OS Storage | Each bare-metal server requires a dedicated boot drive (**120 GB–200 GB+** SSD/NVMe RAID-1) isolated from VM data disks. | [Bare-Metal Cluster Infrastructure Requirements](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/installing_on_bare_metal/index) |
+| Bastion Storage | **500 GB+** available on the active mirror partition to prevent mid-stream workspace exhaustion during catalog syncs. | [Mirroring Images for Disconnected Environments](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/mirroring_images_for_a_disconnected_installation_using_the_oc-mirror_plugin/) |
+| VM Data Storage | Target virtual machine drives present inside compute worker nodes must be left completely **raw and unpartitioned**. | [OpenShift Virtualization Storage Planning](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/openshift_virtualization/installing-virt) |
+| Compute Hardware | Physical worker servers must have bare-metal hypervisor extensions enabled natively within the system BIOS/UEFI. | [OpenShift Virtualization Core Installation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/openshift_virtualization/installing-virt) |
+
+---
+
+## The Sneakernet Workflow
+
+In a completely disconnected environment, the "Sneakernet" process serves as our secure physical bridge to ferry data payloads across the secure perimeter.
+
+| Phase | Action | Requirement |
+| --- | --- | --- |
+| Collection | Mirroring OCP platform channels and virtualization operator catalogs using `oc-mirror --v2` to physical media. | Connected Bastion + Removable Storage |
+| Transition | Physically routing the encrypted storage media through strict corporate security checkpoints. | Verified Chain of Custody |
+| Ingestion | Uploading the structured image layers directly into the local enterprise Quay registry over port 8443. | Offline Registry Bastion + Local Storage Media |
+
+---
+
+## Implementation Roadmap
+
+| Phase | Objective |
+| --- | --- |
+| **Day 0: Preparation** | [Stage the connected environment and retrieve verified orchestrator tools](./01_v_bastion_prep.md) |
+| — | [Declaratively mirror platform and virtualization operator images to local media](./02_v_mirroring_content.md) |
+| — | [Deploy the internal warehouse registry and fuse localized trust tokens](./03_v_registry_setup.md) |
+| **Day 1: Installation** | [Map physical host identities, static routing rules, and logical cluster parameters](./04_v_infrastructure_config.md) |
+| — | [Compile the self-contained Agent boot media and provision bare-metal nodes](./04_v_infrastructure_config.md) |
+| **Day 2: Hardening** | [Subscribe to hypervisor components and isolate high-throughput live migration traffic](./05_v_virtualization_enable.md) |
+| — | [Plumb layer-2 guest network bridges and expose them to local namespaces via Multus](./05_v_virtualization_enable.md) |
+
+---
+
+## Appendix: Methodology & Scope
+
+Official Red Hat product guides serve as the comprehensive technical reference for individual platform elements. This implementation blueprint functions as a production flight checklist specifically synthesized to streamline multi-node virtualization deployments within high-security network zones.
+
+### The "Secret Sauce"
+
+* **Linear Assembly Line**: Eliminates disjointed context-switching by consolidation of mirroring, configuration, networking, and hypervisor setup into one timeline.
+* **Infrastructure Independence**: Leveraging the Agent-Based Installer bypasses the need to maintain external, high-maintenance DHCP or PXE server configurations inside isolated zones.
+* **Hardened Trust Enforced**: Enforces end-to-end cryptographic integrity by matching local container runtime authentication maps to the cluster's internal trust anchors.
+* **Go/No-Go Gates**: Restricts actual deployment actions until underlying physical resources, time servers, and local registry ports are completely validated.
