@@ -45,11 +45,11 @@
 
 ### Objective
 
-Adopting OpenShift Dev Spaces requires clear technical handoffs across OpenShift Platform Engineers, Application Development Leads, and Developers. This guide serves as an operational reference to keep teams aligned throughout deployment and daily use.
+Adopting OpenShift Dev Spaces requires collaboration across OpenShift Platform Engineers, Application Development Leads, and Developers. This guide serves as a reference to keep teams aligned throughout deployment and daily use.
 
 ### Typical Roles
 
-When platform engineers provide stable cluster resources and dev leads curate clean stack specifications, developers can launch, build, and debug without environment friction. Because developer experience is an ongoing practice, developer feedback keeps workspace templates sharp.
+When platform engineers provide stable cluster resources, application development leads curate stack specifications, developers  launch, build, and debug.   Below are a few typical roles that you will need to tune for your team toplogy:
 
 * **OpenShift Platform Engineers** manage cluster platform resources
   * Operator management covering configuration, lifecycle updates, and cluster operator health.
